@@ -196,7 +196,7 @@ TEST (Sort, sortByIncreasingCompactness) {
 	
 	Sort sort;
 	sort.sortByIncreasingCompactness(&myshape);
-	
+	 
 	
 	EXPECT_EQ( cir4 .area()/cir4.perimeter() , (*myshape.back()).area()/(*myshape.back()).perimeter());
 	
