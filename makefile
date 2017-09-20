@@ -17,7 +17,7 @@ Media.o: $(INC_DIR)/Media.h Media.cpp
 	g++ -std=gnu++0x -c Media.cpp
 Sort.o: include/Sort.h Sort.cpp
 	g++ -std=gnu++0x -c Sort.cpp
- 
+  
 clean:	
 ifeq (${OS}, Windows_NT)
 	del *.o *.exe
