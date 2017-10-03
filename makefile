@@ -17,7 +17,11 @@ Media.o: $(INC_DIR)/Media.h Media.cpp
 	g++ -std=gnu++0x -c Media.cpp
 Sort.o: include/Sort.h Sort.cpp
 	g++ -std=gnu++0x -c Sort.cpp
+<<<<<<< HEAD
 
+=======
+ 
+>>>>>>> parent of ea5aea4... Eleventh Commit
 clean:	
 ifeq (${OS}, Windows_NT)
 	del *.o *.exe
