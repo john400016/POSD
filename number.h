@@ -24,6 +24,7 @@ public:
 		ss << _value;
 		return ss.str();
 	}
+	bool match(Term &term);
 
 
 private :

@@ -5,7 +5,6 @@
 #include "term.h"
 
 using namespace std;
-
 class Atom : public Term{
 public:
 
@@ -13,10 +12,7 @@ public:
 
 	string symbol () const{ return _symbol; }
 
-
-
-	
-
+	bool match(Term &term);
 private:
 	string _symbol;
 };
