@@ -1,5 +1,5 @@
 #include "list.h"
-
+#include "variable.h"
 #include <string>
 using namespace std;
 
@@ -29,6 +29,7 @@ string List::value() const{
 
 bool List::match(Term & term){
     List * pl = dynamic_cast<List *>(&term);
+    Variable * pv = dynamic_cast<Variable *>(&term);
     if (pl){
         if(_elements.size()!= pl->_elements.size())
             return false;
@@ -39,12 +40,16 @@ bool List::match(Term & term){
         }
         return true;
     }
+
+    if(pv){
+        return pv->match(*this);
+    }    
     return false;
 }
 
 Term * List::head() const{ 
         if(!_elements.size())
-            throw  string("Accessing tail in an empty list");
+            throw  string("Accessing head in an empty list");
 
     return _elements[0];
 }

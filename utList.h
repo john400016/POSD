@@ -95,7 +95,7 @@ TEST(List, matchToVarShouldSucceed) {
 	ASSERT_EQ("[496, X, terence_tao]",Y.value());
 }
 
-// ?- X = [496, X, terence_tao].
+// ?- X = [496, X, terence_tao].tail
 // false.
 TEST(List, matchToVarOccuredInListShouldFail) {
 	Number num(496);
@@ -104,7 +104,6 @@ TEST(List, matchToVarOccuredInListShouldFail) {
 	std::vector <Term * > v = {&num, &X , &atom};
 	List list(v);
 	ASSERT_FALSE(X.match(list));
-
 }
 
 // ?- [496, X, terence_tao] = [496, X, terence_tao].
@@ -217,7 +216,7 @@ TEST (List, emptyExecptionOfHead) {
 	try{
 		l.head();
 	}catch(string s){
-		EXPECT_EQ("Accessing tail in an empty list",s);
+		EXPECT_EQ("Accessing head in an empty list",s);
 	}
 }
 
@@ -232,8 +231,6 @@ TEST (List, emptyExecptionOfTail) {
 		EXPECT_EQ("Accessing tail in an empty list",s);
 	}
 }
-
-
 
 
 #endif
