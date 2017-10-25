@@ -2,6 +2,7 @@
 #include "atom.h"
 #include "number.h"
 #include "term.h"
+#include "list.h"
 
 #include <iostream>
 #include <vector>
@@ -12,53 +13,10 @@ bool Variable :: getassignable(){
 	return _assignable;
 }
 
-/*bool Variable :: match(Atom &atom){ 
-	if(_assignable || atom.symbol() == _value){
-		_value = atom.symbol();
-		_assignable = false;
-		return true;
-	}
-	return false;
-}
-	
-bool Variable :: match(Number &num){ 
-	if(_assignable || num.value() == _value){
-		_value = num.value();
-		_assignable = false;
-		return true;
-	}
-	return false;
-}
-
-bool Variable :: match(Variable &var){
-
-	Variable * ps = dynamic_cast<Variable *>(&var);
-	bool ret = _assignable;
-	if(ps){
-		if(_assignable && var._assignable){
-			_value = var.value();
-			_args.push_back(&(var));
-			var._args = _args;
-			return true;
-		}else if(!_assignable && var._assignable){
-			for(int i = 0 ;i < var._args.size() ; i++){
-				var._args[i]->value() = _value;
-			}
-			var._assignable = false;
-		}else if(_assignable && !var._assignable){
-			for(int i = 0 ;i < var._args.size() ; i++){
-				_args[i]->value() = var.value();
-			}
-			_assignable = false;
-		}else{
-			return (_value == var.value());
-		}
-	}
-	return false;
-}*/
 bool Variable ::match(Term &term) {
 	Variable *ps = dynamic_cast<Variable *>(&term);
 	Struct *pt = dynamic_cast<Struct *>(&term);
+	List *pl = dynamic_cast<List *>(&term);
 	if(ps) {
 		if(_assignable && ps->_assignable){
 			_value = term.value();
@@ -83,9 +41,8 @@ bool Variable ::match(Term &term) {
 		}else{
 			return false;
 		}
-		
-
 	}
+	
 	if(pt) {
 		if(!_structAssignable || _value == pt->value()) {
 			_struct = pt;
@@ -94,6 +51,22 @@ bool Variable ::match(Term &term) {
 		}
 		return false;
 	}
+
+	if(pl) {
+		if(!_listAssignable || _list->value() == pl->value()) {
+			for(int i = 0; i < pl->eleSize() ;i++){
+				if(_symbol == pl->getEle(i)){
+					return false;
+				}
+			}
+			_list = pl;
+			_listAssignable = true;
+			return true;
+		}
+		return false;
+		
+	}
+
 	bool ret = _assignable;
 	if(ret || _value == term.value()) {
 

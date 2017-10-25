@@ -1,7 +1,6 @@
 #ifndef TERM_H
 #define TERM_H
 
-
 #include <string>
 using namespace std;
 
@@ -18,10 +17,6 @@ public:
 	virtual bool match(Term &term){
 		return symbol() == term.symbol();
 	}
-
-
-
-
 };
 
 

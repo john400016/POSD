@@ -5,6 +5,7 @@
 #include "term.h"
 
 using namespace std;
+class list;
 class Atom : public Term{
 public:
 

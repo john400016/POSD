@@ -7,6 +7,7 @@ using std::string;
 #include "atom.h"
 #include "number.h"
 #include "struct.h"
+#include "list.h"
 class Variable : public Term{
 public:
 	string _symbol;
@@ -15,16 +16,14 @@ public:
 	string value() const {
 		if(_structAssignable) {
 			return _struct->value();
-			
+		}
+		if(_listAssignable) {
+			return _list->value();
 		}
 		return _value;
 	}
 
 	bool getassignable();
-
-	//bool match(Atom &atom);
-	
-	//bool match(Number &num);
 
 	bool match(Term &term);
 
@@ -35,9 +34,10 @@ private:
 	
 	string _value;
 	bool _assignable = true;
-	//std::vector<Variable *> _args;
 	Struct *_struct;
+	List *_list;
 	bool _structAssignable = false;
+	bool _listAssignable = false;
 };
 
 
