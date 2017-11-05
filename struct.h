@@ -19,6 +19,10 @@ public:
         return _args[index];
       }
 
+    int arity(){
+        return _args.size();
+    }
+
     Atom const &name() {
         return _name;
     }
@@ -34,6 +38,10 @@ public:
 
     string symbol() const{
         string ret =_name.symbol() + "(";
+        if ( _args.empty()){
+            ret +=  ")";
+            return  ret;
+        }
         for(int i = 0; i < _args.size() - 1 ; i++){
             ret += _args[i]-> symbol() + ", ";
         }
