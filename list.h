@@ -1,31 +1,27 @@
 #ifndef LIST_H
 #define LIST_H
 
+#include "atom.h"
 #include <vector>
-#include "term.h"
-#include <vector>
-using namespace std;
+#include <string>
+#include <typeinfo>
+#include <iostream>
+using std::vector;
 
+class Variable ;
 
 class List : public Term {
 public:
-    
-    string symbol() const;
-    string value() const;
-    bool match(Term & term);
-
-    List (): _elements() {}
-    List (std ::vector<Term *> const & elements):_elements(elements){}
-   
-    Term * head() const;
-    List * tail() const;
-
-    int eleSize(){ return _elements.size();}
-    string getEle(int index){ return _elements[index]->value();}
-	
+  string symbol() const ;
+  string value() const ;
+  bool match(Term & term) ;
+public:
+  List (): _elements(0) {}
+  List (vector<Term *> const & elements):_elements(elements){}
+  Term * head() const;
+  List * tail() const;
 private:
-    std::vector<Term *> _elements;
-
+  vector<Term *> _elements;
 };
 
 #endif

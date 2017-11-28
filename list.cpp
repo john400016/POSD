@@ -1,77 +1,87 @@
-#include "list.h"
+#include "atom.h"
 #include "variable.h"
+#include <typeinfo>
+#include <iostream>
 #include <string>
-using namespace std;
+#include "list.h"
+using std::vector;
 
 string List::symbol() const{
-    if(!_elements.size()){
-        return "[]";
+    string ret ;
+    if(_elements.size()==0 ){
+      ret = "[]";
     }
-    string ret = "[";
-    for(int i = 0; i < _elements.size() -1 ; i++){
-        ret += _elements[i]-> symbol() + ", ";
+    else{
+      ret  = "[";
+      std::vector<Term *>::const_iterator it = _elements.begin();
+      for( ; it != _elements.end()-1 ; ++it ){
+        ret += (*it)->symbol()+", ";
+      }
+      ret += (*it)->symbol()+"]";
     }
-    ret += _elements[_elements.size() -1] -> symbol() + "]";
     return ret;
-}
-
+  }
 string List::value() const{
-    if(!_elements.size()){
-        return "[]";
+    string ret ;
+    if(_elements.empty()){
+        ret = "[]";
     }
-    string ret = "[";
-    for(int i = 0; i < _elements.size() -1 ; i++){
-        ret += _elements[i]-> value() + ", ";
-    }
-    ret += _elements[_elements.size() -1] -> value() + "]";
-    return ret;
+    else{
+        ret  = "[";
+        std::vector<Term *>::const_iterator it = _elements.begin();
+        for( ; it != _elements.end()-1 ; ++it ){
+        ret += (*it)->value()+", ";
+        }
+        ret += (*it)->value()+"]";
 }
-
-bool List::match(Term & term){
-    List * pl = dynamic_cast<List *>(&term);
-    Variable * pv = dynamic_cast<Variable *>(&term);
-    int count = 0;
-    if (pl){
-        if(_elements.size()!= pl->_elements.size())
-            return false;
-
-        for(int i = 0;i < _elements.size() ;i++){
-            if(_elements[i] == pl -> _elements[i]){
-                count++;
-            }    
-        }
-        if(count == _elements.size()){
-            return true;
-        }
-
-        for(int i = 0;i < _elements.size() ;i++){
-            bool ret = _elements[i] -> match(*(pl -> _elements[i]));
-            if(!ret)
-                return false;
-        }
-        return true;
-    }
-
-    if(pv){
-        return pv->match(*this);
-    }    
-    return false;
+return ret;
 }
-
-Term * List::head() const{ 
-        if(!_elements.size())
-            throw  string("Accessing head in an empty list");
+bool List::match(Term & term) {
+    if(typeid(term) ==  typeid(List)){
+        bool ret =true;
+        List * ptrls = dynamic_cast<List*>(&term);
+        if( _elements.size() != ptrls->_elements.size() ){
+        ret = false;
+        }
+        else{
+            for(int i = 0 ; i < _elements.size() ;i++ ){
+                ret = _elements[i]->match(*(ptrls->_elements[i])) ;
+                if(ret == false)
+                    return ret;
+            }
+        }
+        return ret;
+    }
+    else if(typeid(term) == typeid(Variable)){
+        bool ret =true;
+        for(int i = 0 ; i < _elements.size() ;i++ ){
+        if(_elements[i]->symbol() ==  term.symbol()){
+            if( _elements[i]->symbol() == term.symbol() ){
+                ret= false;
+                return ret;
+            }
+        ret = _elements[i]->match(term) ;
+        }
+        if(ret == false)
+                return ret;
+        }
+        return ret;
+    }
+    else{
+        return value () == term.value();
+    }
+}
+Term * List::head() const{
+    if(_elements.empty())
+        throw std::string("Accessing head in an empty list");
 
     return _elements[0];
 }
-
-List * List::tail() const{
-    if(!_elements.size())
-    throw  string("Accessing tail in an empty list");
-    std ::vector<Term *> v = {};
-    for(int i =1; i < _elements.size();i++){
-        v.push_back(_elements[i]);
-    }
-    List * l = new List(v);
-    return l;
+List * List::tail() const {
+    if(_elements.empty())
+        throw std::string("Accessing tail in an empty list");
+    vector<Term *> _clone_elements;
+    _clone_elements.assign(_elements.begin()+1, _elements.end());
+    List *ls= new List(_clone_elements) ;
+    return ls;
 }
