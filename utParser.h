@@ -2,7 +2,7 @@
 #define UTPARSER_H
 
 #include <string>
-using namespace std;
+
 #include "parser.h"
 #include "scanner.h"
 
@@ -90,7 +90,7 @@ TEST_F(ParserTest, createTerm_StructWithNumber) {
   EXPECT_EQ("point(11)",parser.createTerm()->symbol());
 }
 
-TEST_F(ParserTest, creatmainScanneroeTerm_StructWithTwoNumber) {
+TEST_F(ParserTest, createTerm_StructWithTwoNumber) {
   Scanner scanner("point(11,12)");
   Parser parser(scanner);
   EXPECT_EQ("point(11, 12)",parser.createTerm()->symbol());
@@ -195,23 +195,20 @@ TEST_F(ParserTest, createTerm_ListAsStruct2) {
   Struct * s = dynamic_cast<Struct *>(((Struct *) term)->args(1));
   EXPECT_EQ(".(1, [])", s->symbol());
 }
-TEST_F(ParserTest, test) {
-  Scanner scanner("X=1,Y=2.");
-  Parser parser(scanner);
-  parser.matchings();
-}
 
 TEST_F(ParserTest, OneMatching) {
   Scanner scanner("X=1.");
   Parser parser(scanner);
   parser.matchings();
   vector<Term *> terms = parser.getTerms();
-
   EXPECT_EQ(2, terms.size());
   EXPECT_EQ("X", terms[0]->symbol());
   EXPECT_EQ("1", terms[1]->symbol());
+  EXPECT_NE("1", terms[0]->value());
+
   Node * et = parser.expressionTree();
   EXPECT_EQ(EQUALITY, et->payload);
+
   EXPECT_TRUE(et->evaluate());
   EXPECT_EQ("1", terms[0]->value());
 }
@@ -243,6 +240,7 @@ TEST_F(ParserTest, TwoTermsMatching) {
   Node * et = parser.expressionTree();
   EXPECT_TRUE(et->evaluate());
   EXPECT_EQ(COMMA, et->payload);
+
   EXPECT_EQ("1", terms[0]->value());
   EXPECT_EQ("2", terms[2]->value());
 }
@@ -269,8 +267,8 @@ TEST_F(ParserTest, ThreeTermsMatching) {
   EXPECT_EQ("1", terms[0]->value());
   EXPECT_EQ("2", terms[2]->value());
   EXPECT_EQ("3", terms[4]->value());
-}
 
+}
 
 TEST_F(ParserTest, TwoVariableMatching2) {
   Scanner scanner("X=1, X=Y.");
