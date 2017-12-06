@@ -8,6 +8,8 @@
 #include <iostream>
 using std::vector;
 
+template <class T>
+class Iterator;
 class Variable ;
 
 class List : public Term {
@@ -20,6 +22,13 @@ public:
   List (vector<Term *> const & elements):_elements(elements){}
   Term * head() const;
   List * tail() const;
+  Term *args(int index){
+    return _elements[index];
+  }
+  int arity() const {return _elements.size();}
+  Iterator <Term*>* createIterator();
+  Iterator <Term*>* createDFSIterator();
+  Iterator <Term*>* createBFSIterator();
 private:
   vector<Term *> _elements;
 };
