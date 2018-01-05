@@ -1,36 +1,37 @@
 #ifndef LIST_H
 #define LIST_H
 
-#include "atom.h"
+#include "term.h"
+#include "variable.h"
+
 #include <vector>
-#include <string>
-#include <typeinfo>
-#include <iostream>
+#include <memory>
+
 using std::vector;
-
-template <class T>
+template<class Item>
 class Iterator;
-class Variable ;
+class List : public Term
+{
+public:
+    List();
+    List(vector<Term *> const & elements);
+    Term* head() const;
+    List* tail() const;
+    std::string symbol() const;
+    std::string value() const;
+    bool match(Term &term);
 
-class List : public Term {
-public:
-  string symbol() const ;
-  string value() const ;
-  bool match(Term & term) ;
-public:
-  List (): _elements(0) {}
-  List (vector<Term *> const & elements):_elements(elements){}
-  Term * head() const;
-  List * tail() const;
-  Term *args(int index){
-    return _elements[index];
-  }
-  int arity() const {return _elements.size();}
-  Iterator <Term*>* createIterator();
-  Iterator <Term*>* createDFSIterator();
-  Iterator <Term*>* createBFSIterator();
+//These three functions are for parser when parsing the expression.
+    int   arity();
+    Term* args(int index);
+    void  setArg(int index, Term* term);
+
+    Iterator<Term*> *createIterator();
+    Iterator<Term*> *createDFSIterator();
+    Iterator<Term*> *createBFSIterator();
+
 private:
-  vector<Term *> _elements;
+    bool matchListDiffVar(List *list);
+    vector<Term*> _elements;
 };
-
 #endif

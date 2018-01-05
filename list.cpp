@@ -1,100 +1,131 @@
-#include "atom.h"
-#include "variable.h"
-#include <typeinfo>
-#include <iostream>
-#include <string>
 #include "list.h"
-using std::vector;
 #include "iterator.h"
+List::List()
+    : _elements()
+{
 
-Iterator <Term*>* List::createIterator(){
-    return new ListIterator <Term*>(this);
 }
+List::List(vector<Term*> const &elements)
+    : _elements(elements)
+{
 
-Iterator <Term*>* List::createDFSIterator(){
-    return new DFSIterator <Term*>(this);
 }
-
-Iterator <Term*>* List::createBFSIterator(){
-    return new BFSIterator <Term*>(this);
-}
-
-string List::symbol() const{
-    string ret ;
-    if(_elements.size()==0 ){
-      ret = "[]";
-    }
-    else{
-      ret  = "[";
-      std::vector<Term *>::const_iterator it = _elements.begin();
-      for( ; it != _elements.end()-1 ; ++it ){
-        ret += (*it)->symbol()+", ";
-      }
-      ret += (*it)->symbol()+"]";
-    }
-    return ret;
-  }
-string List::value() const{
-    string ret ;
-    if(_elements.empty()){
-        ret = "[]";
-    }
-    else{
-        ret  = "[";
-        std::vector<Term *>::const_iterator it = _elements.begin();
-        for( ; it != _elements.end()-1 ; ++it ){
-        ret += (*it)->value()+", ";
-        }
-        ret += (*it)->value()+"]";
-}
-return ret;
-}
-bool List::match(Term & term) {
-    if(typeid(term) ==  typeid(List)){
-        bool ret =true;
-        List * ptrls = dynamic_cast<List*>(&term);
-        if( _elements.size() != ptrls->_elements.size() ){
-        ret = false;
-        }
-        else{
-            for(int i = 0 ; i < _elements.size() ;i++ ){
-                ret = _elements[i]->match(*(ptrls->_elements[i])) ;
-                if(ret == false)
-                    return ret;
-            }
-        }
-        return ret;
-    }
-    else if(typeid(term) == typeid(Variable)){
-        bool ret =true;
-        for(int i = 0 ; i < _elements.size() ;i++ ){
-        if(_elements[i]->symbol() ==  term.symbol()){
-            if( _elements[i]->symbol() == term.symbol() ){
-                ret= false;
-                return ret;
-            }
-        ret = _elements[i]->match(term) ;
-        }
-        if(ret == false)
-                return ret;
-        }
-        return ret;
-    }
-    else{
-        return value () == term.value();
-    }
-}
-Term * List::head() const{
+Term* List::head() const
+{
     if(_elements.empty())
         throw std::string("Accessing head in an empty list");
-
-    return _elements[0];
+    else
+        return _elements[0];
 }
-List * List::tail() const {
+List* List::tail() const
+{
     if(_elements.empty())
         throw std::string("Accessing tail in an empty list");
-    vector<Term *> _clone_elements;
-    _clone_elements.assign(_elements.begin()+1, _elements.end());
-    List *ls= new List(_clone_elements) ;
-    return ls;
+    else
+    {
+        std::vector<Term*> v(_elements.begin() + 1, _elements.end());
+        return new List(v);
+    }
+}
+std::string List::value() const
+{
+    std::string sym_name;
+    if(_elements.empty())
+        return "[]";
+    sym_name += '[';
+    for(size_t i=0;i<_elements.size()-1;i++)
+    {
+        sym_name += _elements[i]->value();
+        sym_name += ", ";
+    }
+    sym_name += _elements[_elements.size() - 1]->value();
+    sym_name += ']';
+    return sym_name;
+}
+std::string List::symbol() const
+{
+    std::string sym_name;
+    if(_elements.empty())
+        return "[]";
+    sym_name += '[';
+    for(size_t i=0;i<_elements.size()-1;i++)
+    {
+        sym_name += _elements[i]->symbol();
+        sym_name += ", ";
+    }
+    sym_name += _elements[_elements.size() - 1]->symbol();
+    sym_name += ']';
+    return sym_name;
+}
+bool List::match(Term &term)
+{
+    Variable *var = dynamic_cast<Variable*>(&term);
+    List *list = dynamic_cast<List*>(&term);
+    if(var)
+        return var->match(*this);
+    else if(list)
+        return matchListDiffVar(list);
+    return symbol() == term.symbol();
+}
+bool List::matchListDiffVar(List *list)
+{
+    Variable *var1, *var2;
+    if(list->_elements.size() != _elements.size())
+        return false;
+    for(size_t i=0; i<_elements.size(); i++)
+    {
+        var1 = dynamic_cast<Variable*>(_elements[i]);
+        var2 = dynamic_cast<Variable*>(list->_elements[i]);
+        if(var1 && var2 &&
+                !(var1->symbol() == var1->value() &&
+                    var2->symbol() == var2->value()))
+        {
+            return false;
+        }
+        else if(var1 == nullptr && var2)
+        {
+            bool ret = var2->match(*list->_elements[i]);
+            if(!ret)
+                return false;
+        }
+        else if(var2 == nullptr && var1)
+        {
+            bool ret = var1->match(*list->_elements[i]);
+            if(!ret)
+                return false;
+        }
+        else if(!var1 && !var2 &&
+           _elements[i]->symbol() != list->_elements[i]->symbol())
+        {
+            return false;
+        }
+    }
+    return true;
+}
+int   List::arity()
+{
+    return _elements.size();
+}
+Term* List::args(int index)
+{
+    return _elements[index];
+}
+void  List::setArg(int index, Term* term)
+{
+    _elements[index] = term;
+}
+
+Iterator<Term*> *List::createIterator()
+{
+    return new ListIterator<Term*>(this);
+}
+
+Iterator<Term*> *List::createDFSIterator()
+{
+    return new DFSIterator<Term*>(this);
+}
+
+Iterator<Term*> *List::createBFSIterator()
+{
+    return new BFSIterator<Term*>(this);
 }

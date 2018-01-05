@@ -1,23 +1,17 @@
 #include "atom.h"
-#include "variable.h"
-#include "iterator.h"
-#include <typeinfo>
+Atom::Atom(std::string s):
+    _symbol(s) 
+{
 
-Iterator <Term*>* Term::createIterator(){
-	return new NullIterator <Term*>(this);
+}  
+bool Atom::match(Term &term)
+{
+    Variable *var = dynamic_cast<Variable*>(&term);
+    if(var)
+        return var->match(*this);
+    return _symbol == term.symbol();
 }
-
-Iterator <Term*>* Term::createDFSIterator(){
-	return new NullIterator <Term*>(this);
-}
-
-Iterator <Term*>* Term::createBFSIterator(){
-	return new NullIterator <Term*>(this);
-}
-
-bool Term::match(Term & a){
-	if (typeid(a) ==  typeid(Variable))
-		return a.match(*this);
-	else
-		return symbol() == a.symbol();
+std::string Atom::symbol() const
+{
+    return _symbol;
 }

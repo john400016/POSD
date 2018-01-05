@@ -1,30 +1,24 @@
 #ifndef VARIABLE_H
 #define VARIABLE_H
-
-#include <string>
 #include "atom.h"
-using std::string;
-
-class Variable : public Term {
+#include "list.h"
+#include <vector>
+#include <sstream>
+class Variable : public Term
+{
 public:
-  Variable(string s):Term(s), _inst(0){}
-  string value() const {
-    if (_inst)
-      return _inst->value();
-    else
-      return Term::value();
-  }
-  bool match( Term & term ){
-    if (this == &term)
-      return true;
-    if(!_inst){
-      _inst = &term ;
-      return true;
-    }
-    return _inst->match(term);
-  }
+    Variable(std::string s);
+    std::string value() const;
+    std::string symbol() const;
+    bool match(Term &term);
+    std::string const _symbol;
+    Variable& operator=(Variable const& var);
 private:
-  Term * _inst;
+    void add_shared_var(Variable *var);
+    void instantiate_shared_var(Term *_nvalue);
+    bool checkInsideList(Term const *term) const;
+    Term * _value;
+    std::vector<Variable*> _sharedlist;
+    bool _instantiated;
 };
-
 #endif
